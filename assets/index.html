@@ -21,18 +21,10 @@ function fun()
         global.window.document.getElementById("div").innerHTML = "siyt:" + obj; //require("osenv");//
     } catch (e) {
         console.log("siyt(0708): error=" + e);
-        /*        var div = global.window.document.getElementById("div");//.innerHTML = "error=" + e + "::::::" + global.logs.join();
-                  div.innerHTML = "siyt(0713): error=" + e;
-                  for (var i = 0; i < global.logs.length; i++) {
-                  var sub_div = document.createElement("div");
-                  sub_div.innerHTML = global.logs[i];
-                  div.appendChild(sub_div);
-                  }*/
     }
     var div = global.window.document.getElementById("div");
     printGlobalLog(div);
 }
-//console.log("siyt(0708): global.console=" + console);
 var os=require('os');
 console.log("siyt(0708): os.type=" + os.type());
 console.log("siyt(0708): os.platform=" + os.platform());
@@ -80,6 +72,7 @@ function fun3()
 }
 
 </script>
+<h3>test</h3>
 <div id="div"> div </div>
 <input type="button" id="input" onclick="fun()" value="require('traverse')"/>
 <div id="div1"> div </div>

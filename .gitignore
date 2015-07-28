@@ -1,0 +1,12 @@
+bin/
+gen/
+.classpath
+.project
+project.properties
+.settings/
+assets/
+
+~natives_blob.bin
+~snapshot_blob.bin
+~icudtl.dat
+~content_shell.pak

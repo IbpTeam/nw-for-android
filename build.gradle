@@ -1,0 +1,184 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import java.util.regex.Pattern
+
+apply plugin: 'android'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    // Switch the Android Gradle plugin version requirement depending on the
+    // installed version of Gradle. This dependency is documented at
+    // http://tools.android.com/tech-docs/new-build-system/version-compatibility
+    // and https://issues.apache.org/jira/browse/CB-8143
+    if (gradle.gradleVersion >= "2.2") {
+        dependencies {
+            classpath 'com.android.tools.build:gradle:1.2.3'
+        }
+    } else if (gradle.gradleVersion >= "2.1") {
+        dependencies {
+            classpath 'com.android.tools.build:gradle:0.14.0+'
+        }
+    } else {
+        dependencies {
+            classpath 'com.android.tools.build:gradle:0.12.0+'
+        }
+    }
+}
+
+ext.multiarch=false
+ext {
+    apply from: 'macro.gradle'
+    // The value for android.compileSdkVersion.
+    if (!project.hasProperty('cdvCompileSdkVersion')) {
+        cdvCompileSdkVersion = privateHelpers.getProjectTarget()
+    }
+    // The value for android.buildToolsVersion.
+    if (!project.hasProperty('cdvBuildToolsVersion')) {
+        cdvBuildToolsVersion = privateHelpers.findLatestInstalledBuildTools()
+    }
+    // Sets the versionCode to the given value.
+    if (!project.hasProperty('cdvVersionCode')) {
+        cdvVersionCode = null
+    }
+    // Sets the minSdkVersion to the given value.
+    if (!project.hasProperty('cdvMinSdkVersion')) {
+        cdvMinSdkVersion = null
+    }
+    // Whether to build architecture-specific APKs.
+    if (!project.hasProperty('cdvBuildMultipleApks')) {
+        cdvBuildMultipleApks = false
+    }
+    // .properties files to use for release signing.
+    if (!project.hasProperty('cdvReleaseSigningPropertiesFile')) {
+        cdvReleaseSigningPropertiesFile = null
+    }
+    // .properties files to use for debug signing.
+    if (!project.hasProperty('cdvDebugSigningPropertiesFile')) {
+        cdvDebugSigningPropertiesFile = null
+    }
+    // Set by build.js script.
+    if (!project.hasProperty('cdvBuildArch')) {
+        cdvBuildArch = null
+    }
+}
+task cdvBuildRelease
+cdvBuildRelease.dependsOn {
+    return computeBuildTargetName(false)
+}
+
+task cdvPrintProps << {
+    println('cdvCompileSdkVersion=' + cdvCompileSdkVersion)
+    println('cdvBuildToolsVersion=' + cdvBuildToolsVersion)
+    println('cdvVersionCode=' + cdvVersionCode)
+    println('cdvMinSdkVersion=' + cdvMinSdkVersion)
+    println('cdvBuildMultipleApks=' + cdvBuildMultipleApks)
+    println('cdvReleaseSigningPropertiesFile=' + cdvReleaseSigningPropertiesFile)
+    println('cdvDebugSigningPropertiesFile=' + cdvDebugSigningPropertiesFile)
+    println('cdvBuildArch=' + cdvBuildArch)
+    println('computedVersionCode=' + android.defaultConfig.versionCode)
+    if (android.productFlavors.has('armv7')) {
+        println('computedArmv7VersionCode=' + android.productFlavors.armv7.versionCode)
+    }
+    if (android.productFlavors.has('x86')) {
+        println('computedx86VersionCode=' + android.productFlavors.x86.versionCode)
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+//    for (subproject in getProjectList()) {
+//        compile project(subproject)
+//    }
+    //compile 'com.google.android.support:wearable:1.2.0'
+    //compile 'com.google.android.gms:play-services-wearable:7.5.0'
+}
+
+android {
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+
+    defaultConfig {
+        versionCode Integer.parseInt("" + getVersionCodeFromManifest() + "0")
+    }
+
+    compileSdkVersion cdvCompileSdkVersion
+    buildToolsVersion cdvBuildToolsVersion
+
+    if (multiarch || System.env.BUILD_MULTIPLE_APKS) {
+        productFlavors {
+            armv7 {
+                versionCode defaultConfig.versionCode + 2
+                ndk {
+                    abiFilters "armeabi-v7a", ""
+                }
+            }
+            x86 {
+                versionCode defaultConfig.versionCode + 4
+                ndk {
+                    abiFilters "x86", ""
+                }
+            }
+            all {
+                ndk {
+                    abiFilters "all", ""
+                }
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    signingConfigs {
+        release {
+            storeFile file("ibp.key")
+            storePassword "ibp.key"
+            keyAlias "ibp.key"
+            keyPassword "ibp.key"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
+
+def getVersionCodeFromManifest() {
+    def manifestFile = file(android.sourceSets.main.manifest.srcFile)
+    def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
+    def matcher = pattern.matcher(manifestFile.getText())
+    matcher.find()
+    return Integer.parseInt(matcher.group(1))
+}
+
+def getProjectList() {
+    def manifestFile = file("project.properties")
+    def pattern = Pattern.compile("android.library.reference.(\\d+)\\s*=\\s*(.*)")
+    def matcher = pattern.matcher(manifestFile.getText())
+    def projects = []
+    while (matcher.find()) {
+      projects.add(":" + matcher.group(2).replace("/",":"))
+    }
+    return projects
+}

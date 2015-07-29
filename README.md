@@ -41,3 +41,23 @@ sudo apt-get install eclipse
 最后，重新打包生成apk文件。
 
 
+### 使用Android Studio编译android应用
+1、安装Android Studio
+--------
+ubuntu 下安装eclipse命令：
+```
+sudo apt-get install eclipse
+```
+
+2、 配置SDK
+------
+在安装中选SDK所在目录,下载的SDK要支持`android-21（android 5.0版本）`
+点击File-->Project Structure-->Android SDK Location，输入sdk路径。
+
+3、 导入项目
+------
+点集File-->New-->Import Project
+选择本项目目录。
+
+4、生成apk
+Build-->Generate Signed APK，签名可以使用自己生成的签名，也可以使用项目目录下的签名ibp.key，密码与文件名相同。

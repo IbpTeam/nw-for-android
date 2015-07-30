@@ -10,3 +10,10 @@ assets/
 ~snapshot_blob.bin
 ~icudtl.dat
 ~content_shell.pak
+
+
+# Gradle builds
+/build
+.gradle/
+.idea/
+local.properties

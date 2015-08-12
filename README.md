@@ -27,7 +27,7 @@ install-ADT-offline：
 
    (2) open eclipse，Help-->Install New software...-->Add（choise adt path）
 
-####  3、 配置SDK
+####  3、 set SDK
 
 download SDK and set SDK path.
 the SDK shoould include `android-21（android v5.0）` abi.

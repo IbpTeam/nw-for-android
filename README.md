@@ -5,7 +5,7 @@ It is base on content_shell of chromium (42.0.2272.76)and nodejs of nw12(0.12.0)
 You can use eclipse or android studio to compile the project.
 [nw.js](https://github.com/nwjs/nw.js)
 
-the project files is collected from [chromium](git@124.16.141.145:android/runtime-chromium.git)
+the project files is collected from [chromium](http://124.16.141.145/android/runtime-chromium.git)
 
 
 ### use eclipse to build

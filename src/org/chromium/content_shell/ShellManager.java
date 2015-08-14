@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.os.Environment;
 
 import org.chromium.base.CalledByNative;
 import org.chromium.base.JNINamespace;
@@ -55,9 +56,11 @@ public class ShellManager extends FrameLayout {
     }
 
     private String NODE_MODULES_PATH;
+    private String NODE_MODULES_PATH_SD;
     private void initNodeModulePath(final Context context) {
         try {
             NODE_MODULES_PATH = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).dataDir + "/node_modules";
+            NODE_MODULES_PATH_SD =  Environment.getExternalStorageDirectory().getPath() + "/content_shell/node_modules";
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -210,7 +213,7 @@ public class ShellManager extends FrameLayout {
         Shell previousShell = mActiveShell;
         nativeLaunchShell(url);
         if (previousShell != null) previousShell.close();
-        if (mActiveShell != null) mActiveShell.getContentViewCore().getContentSettings().SetNodeModuesPath(NODE_MODULES_PATH);
+        if (mActiveShell != null) mActiveShell.getContentViewCore().getContentSettings().SetNodeModuesPath(NODE_MODULES_PATH+":"+NODE_MODULES_PATH_SD);
     }
 
     /**

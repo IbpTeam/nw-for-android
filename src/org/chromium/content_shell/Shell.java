@@ -51,10 +51,10 @@ public class Shell extends LinearLayout {
     private WebContents mWebContents;
     private NavigationController mNavigationController;
     private ContentViewClient mContentViewClient;
-    private EditText mUrlTextView;
-    private ImageButton mPrevButton;
-    private ImageButton mNextButton;
-    private ImageButton mStopReloadButton;
+    //private EditText mUrlTextView;
+    //private ImageButton mPrevButton;
+    //private ImageButton mNextButton;
+    //private ImageButton mStopReloadButton;
 
     private ClipDrawable mProgressDrawable;
 
@@ -140,11 +140,11 @@ public class Shell extends LinearLayout {
         super.onFinishInflate();
 
         mProgressDrawable = (ClipDrawable) findViewById(R.id.toolbar).getBackground();
-        initializeUrlField();
-        initializeNavigationButtons();
+        //initializeUrlField();
+        //initializeNavigationButtons();
     }
 
-    private void initializeUrlField() {
+    /*private void initializeUrlField() {
         mUrlTextView = (EditText) findViewById(R.id.url);
         mUrlTextView.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
@@ -182,7 +182,7 @@ public class Shell extends LinearLayout {
                 return false;
             }
         });
-    }
+    }*/
 
     /**
      * Loads an URL.  This will perform minimal amounts of sanitizing of the URL to attempt to
@@ -192,13 +192,13 @@ public class Shell extends LinearLayout {
      */
     public void loadUrl(String url) {
         if (url == null) return;
-
-        if (TextUtils.equals(url, mWebContents.getUrl())) {
+        mNavigationController.loadUrl(new LoadUrlParams(sanitizeUrl(url)));
+        /*if (TextUtils.equals(url, mWebContents.getUrl())) {
             mNavigationController.reload(true);
         } else {
             mNavigationController.loadUrl(new LoadUrlParams(sanitizeUrl(url)));
-        }
-        mUrlTextView.clearFocus();
+        }*/
+        //mUrlTextView.clearFocus();
         // TODO(aurimas): Remove this when crbug.com/174541 is fixed.
         mContentViewCore.getContainerView().clearFocus();
         mContentViewCore.getContainerView().requestFocus();
@@ -215,7 +215,7 @@ public class Shell extends LinearLayout {
         return url;
     }
 
-    private void initializeNavigationButtons() {
+    /*private void initializeNavigationButtons() {
         mPrevButton = (ImageButton) findViewById(R.id.prev);
         mPrevButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -239,12 +239,12 @@ public class Shell extends LinearLayout {
                 else mNavigationController.reload(true);
             }
         });
-    }
+    }*/
 
     @SuppressWarnings("unused")
     @CalledByNative
     private void onUpdateUrl(String url) {
-        mUrlTextView.setText(url);
+        //mUrlTextView.setText(url);
     }
 
     @SuppressWarnings("unused")
@@ -258,8 +258,8 @@ public class Shell extends LinearLayout {
     @CalledByNative
     private void toggleFullscreenModeForTab(boolean enterFullscreen) {
         mIsFullscreen = enterFullscreen;
-        LinearLayout toolBar = (LinearLayout) findViewById(R.id.toolbar);
-        toolBar.setVisibility(enterFullscreen ? GONE : VISIBLE);
+        //LinearLayout toolBar = (LinearLayout) findViewById(R.id.toolbar);
+        //toolBar.setVisibility(enterFullscreen ? GONE : VISIBLE);
 
         if (!mIsFullscreen) {
             ContentVideoView videoView = ContentVideoView.getContentVideoView();
@@ -276,12 +276,12 @@ public class Shell extends LinearLayout {
     @CalledByNative
     private void setIsLoading(boolean loading) {
         mLoading = loading;
-        if (mLoading) {
+        /*if (mLoading) {
             mStopReloadButton
                     .setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
         } else {
             mStopReloadButton.setImageResource(R.drawable.ic_refresh);
-        }
+        }*/
     }
 
     /**
@@ -299,9 +299,9 @@ public class Shell extends LinearLayout {
         mWebContents = mContentViewCore.getWebContents();
         mNavigationController = mWebContents.getNavigationController();
         if (getParent() != null) mContentViewCore.onShow();
-        if (mWebContents.getUrl() != null) {
+        /*if (mWebContents.getUrl() != null) {
             mUrlTextView.setText(mWebContents.getUrl());
-        }
+        }*/
         ((FrameLayout) findViewById(R.id.contentview_holder)).addView(cv,
                 new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT,
@@ -318,8 +318,9 @@ public class Shell extends LinearLayout {
      */
     @CalledByNative
     private void enableUiControl(int controlId, boolean enabled) {
-        if (controlId == 0) mPrevButton.setEnabled(enabled);
+        /*if (controlId == 0) mPrevButton.setEnabled(enabled);
         else if (controlId == 1) mNextButton.setEnabled(enabled);
+        */
     }
 
     /**
@@ -343,7 +344,7 @@ public class Shell extends LinearLayout {
         return mWebContents;
     }
 
-    private void setKeyboardVisibilityForUrl(boolean visible) {
+    /*private void setKeyboardVisibilityForUrl(boolean visible) {
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         if (visible) {
@@ -351,7 +352,7 @@ public class Shell extends LinearLayout {
         } else {
             imm.hideSoftInputFromWindow(mUrlTextView.getWindowToken(), 0);
         }
-    }
+    }*/
 
     private static native void nativeCloseShell(long shellPtr);
 }

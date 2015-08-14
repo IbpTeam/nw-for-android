@@ -1,6 +1,14 @@
 <html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+</head>
 <body>
 <script>
+     process.on('uncaughtException', function(err) {
+        console.log('wwtwwt: ' + err);
+    });
+
 function printGlobalLog(parent)
 {
     if (!global.logs) return;
@@ -18,20 +26,21 @@ function fun()
         traverse(obj).forEach(function (x) {
                 if (x < 0) this.update(x + 128);
                 });
-        global.window.document.getElementById("div").innerHTML = "siyt:" + obj; //require("osenv");//
+        global.window.document.getElementById("div").innerHTML += " traverse:" + obj; //require("osenv");//
     } catch (e) {
         console.log("siyt(0708): error=" + e);
     }
     var div = global.window.document.getElementById("div");
     printGlobalLog(div);
 }
-var os=require('os');
-console.log("siyt(0708): os.type=" + os.type());
-console.log("siyt(0708): os.platform=" + os.platform());
+
 function fun1()
 {
+    var child = require("child_process");
     try {
-        window.document.getElementById("div1").innerHTML = process;
+       child.exec("ls /",function(err,stdout,stderr){
+         window.document.getElementById("div1").innerHTML += "<br> err= " +err+"<br> stdout= " + stdout+ "<br> stderr= " + stderr; 
+        }) 
     } catch (e) {
         console.log("siyt(0708): 1  error=" + e);
     }
@@ -41,7 +50,7 @@ function fun1()
 function fun2()
 {
     var fs = require("fs");
-    var node_module_path = "/mnt/sdcard/content_shell/node_module";
+    var node_module_path = "/mnt/sdcard";
     var parent_div = global.window.document.getElementById("div2");
     fs.readdir(node_module_path, function(err, files) {
             for (var i = 0; i < files.length; i++) {
@@ -72,14 +81,20 @@ function fun3()
 }
 
 </script>
-<h3>test</h3>
-<div id="div"> div </div>
+<h3>test demo</h3>
+<p id="message"></p>
+<div id="div"> div1: test js node modules </div>
 <input type="button" id="input" onclick="fun()" value="require('traverse')"/>
-<div id="div1"> div </div>
-<input type="button" id="input" onclick="fun1()" value="process"/>
-<div id="div2"> div </div>
+<div id="div1"> div2: test child_process.exec("ls /",function(err,stdout,stderr){}) </div>
+<input type="button" id="input" onclick="fun1()" value="child_process"/>
+<div id="div2"> div3: test fs.readdir("/mnt/sdcard")  </div>
 <input type="button" id="input" onclick="fun2()" value="require('fs')"/>
-<div id="div3"> div </div>
+<div id="div3"> div4: test c++ node modules</div>
 <input type="button" id="input" onclick="fun3()" value="require('binding')"/>
+<script>
+var os=require('os');
+document.getElementById("message").innerHTML += "<br> os.type=" + os.type();
+document.getElementById("message").innerHTML += "<br> os.platform=" + os.platform();
+</script>
 </body>
 </html>
